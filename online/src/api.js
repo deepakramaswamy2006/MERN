@@ -1,5 +1,6 @@
 // src/api.js
-const API_BASE = 'http://localhost:4000/api'
+// Use relative URL for production (Vercel), absolute for local development
+const API_BASE = import.meta.env.PROD ? '/api' : 'http://localhost:4000/api'
 
 // Helper to get auth token
 function getAuthToken() {
