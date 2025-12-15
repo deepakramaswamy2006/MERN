@@ -1,7 +1,15 @@
-const express = require('express')
-const mongoose = require('mongoose')
-const cors = require('cors')
-require('dotenv').config({ path: './backend/.env' })
+import express from 'express'
+import mongoose from 'mongoose'
+import cors from 'cors'
+import dotenv from 'dotenv'
+
+// Import routes
+import usersRouter from '../backend/routes/users.js'
+import productsRouter from '../backend/routes/products.js'
+import ordersRouter from '../backend/routes/orders.js'
+import sellerRouter from '../backend/routes/seller.js'
+
+dotenv.config()
 
 const app = express()
 
@@ -17,12 +25,6 @@ if (MONGO_URI) {
     .catch(err => console.error('MongoDB connection error:', err))
 }
 
-// Import routes
-const usersRouter = require('../backend/routes/users')
-const productsRouter = require('../backend/routes/products')
-const ordersRouter = require('../backend/routes/orders')
-const sellerRouter = require('../backend/routes/seller')
-
 // Use routes
 app.use('/api/users', usersRouter)
 app.use('/api/products', productsRouter)
@@ -30,10 +32,10 @@ app.use('/api/orders', ordersRouter)
 app.use('/api/seller', sellerRouter)
 
 // Health check
-app.get('/api', (req, res) => {
+app.get('/api', (_req, res) => {
   res.json({ message: 'API is running' })
 })
 
 // Export for Vercel
-module.exports = app
+export default app
 

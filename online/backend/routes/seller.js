@@ -1,9 +1,10 @@
-const express = require('express')
+import express from 'express'
+import Product from '../models/Product.js'
+import User from '../models/User.js'
+import auth from '../middleware/auth.js'
+import sellerAuth from '../middleware/seller.js'
+
 const router = express.Router()
-const Product = require('../models/Product')
-const User = require('../models/User')
-const auth = require('../middleware/auth')
-const sellerAuth = require('../middleware/seller')
 
 // GET seller's products
 router.get('/products', auth, sellerAuth, async (req, res) => {
@@ -99,5 +100,5 @@ router.get('/stats', auth, sellerAuth, async (req, res) => {
   }
 })
 
-module.exports = router
+export default router
 

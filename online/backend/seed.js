@@ -1,7 +1,8 @@
-const mongoose = require('mongoose')
-require('dotenv').config()
+import mongoose from 'mongoose'
+import dotenv from 'dotenv'
+import Product from './models/Product.js'
 
-const Product = require('./models/Product')
+dotenv.config()
 
 // This script removes all products that were NOT added by sellers
 // Only seller-uploaded products will remain

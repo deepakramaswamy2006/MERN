@@ -1,6 +1,7 @@
-const express = require('express')
+import express from 'express'
+import Product from '../models/Product.js'
+
 const router = express.Router()
-const Product = require('../models/Product')
 
 // GET all products
 router.get('/', async (req, res) => {
@@ -48,5 +49,5 @@ router.post('/seed', async (req, res) => {
   }
 })
 
-module.exports = router
+export default router
 

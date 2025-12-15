@@ -6,5 +6,5 @@ const sellerAuth = (req, res, next) => {
   next()
 }
 
-module.exports = sellerAuth
+export default sellerAuth
 
