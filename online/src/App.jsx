@@ -10,6 +10,8 @@ import OrderSuccess from './pages/OrderSuccess'
 import Login from './pages/Login'
 import Signup from './pages/Signup'
 import Profile from './pages/Profile'
+import SellerSignup from './pages/SellerSignup'
+import SellerDashboard from './pages/SellerDashboard'
 
 export default function App() {
   return (
@@ -26,6 +28,8 @@ export default function App() {
           <Route path="/login" element={<Login />} />
           <Route path="/signup" element={<Signup />} />
           <Route path="/profile" element={<Profile />} />
+          <Route path="/become-seller" element={<SellerSignup />} />
+          <Route path="/seller/dashboard" element={<SellerDashboard />} />
         </Routes>
       </main>
     </div>

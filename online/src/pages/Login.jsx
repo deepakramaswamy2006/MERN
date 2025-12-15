@@ -1,13 +1,15 @@
 import React, { useState } from 'react'
-import { Link, useNavigate } from 'react-router-dom'
+import { Link } from 'react-router-dom'
+import { login } from '../api'
 
 export default function Login() {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
+  const [role, setRole] = useState('buyer')
   const [error, setError] = useState('')
-  const navigate = useNavigate()
+  const [loading, setLoading] = useState(false)
 
-  function handleSubmit(e) {
+  async function handleSubmit(e) {
     e.preventDefault()
     setError('')
 
@@ -17,16 +19,28 @@ export default function Login() {
       return
     }
 
-    // Mock login - in real app, call backend API
-    const users = JSON.parse(localStorage.getItem('users') || '[]')
-    const user = users.find(u => u.email === email && u.password === password)
-
-    if (user) {
-      localStorage.setItem('currentUser', JSON.stringify({ email: user.email, name: user.name }))
-      // Reload to update Header with user info
-      window.location.href = '/'
-    } else {
-      setError('Invalid email or password')
+    setLoading(true)
+    try {
+      const data = await login(email, password, role)
+      // Store user with token and role
+      localStorage.setItem('currentUser', JSON.stringify({
+        token: data.token,
+        name: data.user.name,
+        email: data.user.email,
+        id: data.user.id,
+        role: data.user.role,
+        shopName: data.user.shopName
+      }))
+      // Redirect based on role
+      if (data.user.role === 'seller') {
+        window.location.href = '/seller/dashboard'
+      } else {
+        window.location.href = '/'
+      }
+    } catch (err) {
+      setError(err.message || 'Invalid email or password')
+    } finally {
+      setLoading(false)
     }
   }
 
@@ -42,6 +56,63 @@ export default function Login() {
         )}
 
         <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+          {/* Role Selection */}
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+            <span style={{ fontWeight: 500 }}>Login as</span>
+            <div style={{ display: 'flex', gap: 12 }}>
+              <label
+                style={{
+                  flex: 1,
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  gap: 8,
+                  padding: 12,
+                  borderRadius: 8,
+                  border: role === 'buyer' ? '2px solid var(--accent)' : '2px solid #ddd',
+                  background: role === 'buyer' ? '#f0f9ff' : '#fff',
+                  cursor: 'pointer',
+                  transition: 'all 0.2s'
+                }}
+              >
+                <input
+                  type="radio"
+                  name="role"
+                  value="buyer"
+                  checked={role === 'buyer'}
+                  onChange={() => setRole('buyer')}
+                  style={{ display: 'none' }}
+                />
+                <span style={{ fontWeight: 600 }}>Buyer</span>
+              </label>
+              <label
+                style={{
+                  flex: 1,
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  gap: 8,
+                  padding: 12,
+                  borderRadius: 8,
+                  border: role === 'seller' ? '2px solid var(--accent)' : '2px solid #ddd',
+                  background: role === 'seller' ? '#f0f9ff' : '#fff',
+                  cursor: 'pointer',
+                  transition: 'all 0.2s'
+                }}
+              >
+                <input
+                  type="radio"
+                  name="role"
+                  value="seller"
+                  checked={role === 'seller'}
+                  onChange={() => setRole('seller')}
+                  style={{ display: 'none' }}
+                />
+                <span style={{ fontWeight: 600 }}>Seller</span>
+              </label>
+            </div>
+          </div>
+
           <label style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
             <span>Email</span>
             <input
@@ -64,8 +135,8 @@ export default function Login() {
             />
           </label>
 
-          <button type="submit" className="btn" style={{ padding: 12, fontSize: 16 }}>
-            Login
+          <button type="submit" className="btn" style={{ padding: 12, fontSize: 16 }} disabled={loading}>
+            {loading ? 'Logging in...' : `Login as ${role === 'buyer' ? 'Buyer' : 'Seller'}`}
           </button>
         </form>
 
@@ -75,8 +146,15 @@ export default function Login() {
             Sign up
           </Link>
         </p>
+        {role === 'seller' && (
+          <p style={{ textAlign: 'center', marginTop: 10, marginBottom: 0 }}>
+            Want to become a seller?{' '}
+            <Link to="/become-seller" style={{ color: 'var(--accent)', fontWeight: 600 }}>
+              Register as Seller
+            </Link>
+          </p>
+        )}
       </div>
     </div>
   )
 }
-

@@ -7,6 +7,9 @@ export default function CartPage(){
   const { cart, updateQty, removeFromCart, total } = useCart()
   const nav = useNavigate()
 
+  // Calculate total items
+  const totalItems = cart.reduce((sum, item) => sum + item.qty, 0)
+
   if (cart.length === 0) return (
     <div className="center">
       <div className="card" style={{padding:30}}>
@@ -19,7 +22,7 @@ export default function CartPage(){
   return (
     <div style={{display:'grid', gridTemplateColumns:'1fr 320px', gap:18}}>
       <div>
-        <h3>Cart items</h3>
+        <h3>Cart items ({cart.length} {cart.length === 1 ? 'product' : 'products'})</h3>
         <div className="cart-list">
           {cart.map(item => (
             <CartItem
@@ -32,13 +35,27 @@ export default function CartPage(){
         </div>
       </div>
 
-      <aside className="card">
-        <h4>Summary</h4>
-        <div className="row" style={{justifyContent:'space-between', margin:'12px 0'}}>
-          <div className="muted">Subtotal</div>
-          <div>₹{total}</div>
+      <aside className="card" style={{ height: 'fit-content', position: 'sticky', top: 20 }}>
+        <h4>Order Summary</h4>
+        <div style={{ borderBottom: '1px solid #eee', paddingBottom: 12, marginBottom: 12 }}>
+          {cart.map(item => (
+            <div key={item.id} className="row" style={{justifyContent:'space-between', marginBottom: 8, fontSize: 14}}>
+              <div className="muted">{item.name} × {item.qty}</div>
+              <div>₹{item.price * item.qty}</div>
+            </div>
+          ))}
         </div>
-        <button className="btn" onClick={()=>nav('/checkout')}>Proceed to checkout</button>
+        <div className="row" style={{justifyContent:'space-between', marginBottom: 8}}>
+          <div className="muted">Total Items</div>
+          <div>{totalItems}</div>
+        </div>
+        <div className="row" style={{justifyContent:'space-between', marginBottom: 16}}>
+          <div style={{ fontWeight: 600, fontSize: 18 }}>Total Amount</div>
+          <div style={{ fontWeight: 700, fontSize: 18, color: 'var(--accent)' }}>₹{total}</div>
+        </div>
+        <button className="btn" style={{ width: '100%', padding: 12 }} onClick={()=>nav('/checkout')}>
+          Proceed to Checkout
+        </button>
       </aside>
     </div>
   )

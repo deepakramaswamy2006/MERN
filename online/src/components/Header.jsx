@@ -84,20 +84,38 @@ export default function Header(){
 
           {/* Profile Icon */}
           {user ? (
-            <Link
-              to="/profile"
-              title={`Profile - ${user.name}`}
-              style={{
-                display: 'flex',
-                alignItems: 'center',
-                gap: 6,
-                color: 'var(--accent)',
-                textDecoration: 'none'
-              }}
-            >
-              <ProfileIcon />
-              <span style={{ fontSize: 14, fontWeight: 500 }}>{user.name}</span>
-            </Link>
+            <>
+              {user.role === 'seller' && (
+                <Link
+                  to="/seller/dashboard"
+                  style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: 4,
+                    color: 'var(--accent)',
+                    textDecoration: 'none',
+                    fontSize: 14,
+                    fontWeight: 500
+                  }}
+                >
+                  📦 Dashboard
+                </Link>
+              )}
+              <Link
+                to="/profile"
+                title={`Profile - ${user.name}`}
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: 6,
+                  color: 'var(--accent)',
+                  textDecoration: 'none'
+                }}
+              >
+                <ProfileIcon />
+                <span style={{ fontSize: 14, fontWeight: 500 }}>{user.name}</span>
+              </Link>
+            </>
           ) : (
             <>
               <Link to="/login" className="link-muted">Login</Link>

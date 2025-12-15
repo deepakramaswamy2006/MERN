@@ -3,10 +3,27 @@ import React, { createContext, useContext, useEffect, useState } from 'react'
 
 const CartContext = createContext()
 
+// Get user-specific cart key
+function getCartKey() {
+  try {
+    const user = localStorage.getItem('currentUser')
+    if (user) {
+      const parsed = JSON.parse(user)
+      return `cart_${parsed.id || parsed.email}`
+    }
+  } catch (err) {
+    console.error('Error getting cart key', err)
+  }
+  return 'cart_guest'
+}
+
 export function CartProvider({ children }) {
+  const [cartKey, setCartKey] = useState(getCartKey)
+
   const [cart, setCart] = useState(() => {
     try {
-      const raw = localStorage.getItem('cart_v1')
+      const key = getCartKey()
+      const raw = localStorage.getItem(key)
       return raw ? JSON.parse(raw) : []
     } catch (err) {
       console.error('Failed to read cart from localStorage', err)
@@ -14,21 +31,44 @@ export function CartProvider({ children }) {
     }
   })
 
+  // Listen for user changes (login/logout)
+  useEffect(() => {
+    const newKey = getCartKey()
+    if (newKey !== cartKey) {
+      setCartKey(newKey)
+      // Load cart for new user
+      try {
+        const raw = localStorage.getItem(newKey)
+        setCart(raw ? JSON.parse(raw) : [])
+      } catch (err) {
+        setCart([])
+      }
+    }
+  })
+
   useEffect(() => {
     try {
-      localStorage.setItem('cart_v1', JSON.stringify(cart))
+      localStorage.setItem(cartKey, JSON.stringify(cart))
     } catch (err) {
       console.error('Failed to save cart to localStorage', err)
     }
-  }, [cart])
+  }, [cart, cartKey])
 
   function addToCart(product, qty = 1) {
+    // Ensure we have a consistent id
+    const productId = product.id || product._id
+    if (!productId) {
+      console.error('Product has no id:', product)
+      return
+    }
+
     setCart(prev => {
-      const found = prev.find(p => p.id === product.id)
+      const found = prev.find(p => p.id === productId)
       if (found) {
-        return prev.map(p => (p.id === product.id ? { ...p, qty: p.qty + qty } : p))
+        return prev.map(p => (p.id === productId ? { ...p, qty: p.qty + qty } : p))
       }
-      return [...prev, { ...product, qty }]
+      // Store with consistent id
+      return [...prev, { ...product, id: productId, qty }]
     })
   }
 

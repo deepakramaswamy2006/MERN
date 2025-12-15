@@ -32,7 +32,7 @@ export default function Home(){
       <h2 className="center">Groceries near you</h2>
       <div className="grid">
         {products.map(p => (
-          <ProductCard key={p.id} product={p} onAdd={(prod)=>addToCart(prod,1)} />
+          <ProductCard key={p.id || p._id} product={p} onAdd={(prod)=>addToCart(prod,1)} />
         ))}
       </div>
     </div>

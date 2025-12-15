@@ -1,6 +1,7 @@
 import React, { useState } from 'react'
 import { useCart } from '../context/CartContext'
 import { useNavigate, useLocation } from 'react-router-dom'
+import { placeOrder } from '../api'
 
 export default function Payment() {
   const { cart, total, clearCart } = useCart()
@@ -35,7 +36,7 @@ export default function Payment() {
     return v
   }
 
-  function handleSubmit(e) {
+  async function handleSubmit(e) {
     e.preventDefault()
     setError('')
 
@@ -60,17 +61,41 @@ export default function Payment() {
 
     setProcessing(true)
 
-    // Simulate payment processing
-    setTimeout(() => {
-      setProcessing(false)
+    try {
+      // Prepare order data
+      const orderData = {
+        items: cart.map(item => ({
+          product: item._id || item.id,
+          name: item.name,
+          price: item.price,
+          qty: item.qty
+        })),
+        total: total,
+        shippingAddress: {
+          name: checkoutData.name || '',
+          email: checkoutData.email || '',
+          phone: checkoutData.phone || '',
+          address: checkoutData.address || ''
+        },
+        paymentMethod: paymentMethod
+      }
+
+      // Save order to database
+      const result = await placeOrder(orderData)
+
       clearCart()
-      navigate('/order-success', { 
-        state: { 
+      navigate('/order-success', {
+        state: {
           orderTotal: total,
+          orderId: result.orderId,
           customerName: checkoutData.name || 'Customer'
-        } 
+        }
       })
-    }, 2000)
+    } catch (err) {
+      console.error('Order failed:', err)
+      setError(err.message || 'Failed to place order. Please try again.')
+      setProcessing(false)
+    }
   }
 
   if (cart.length === 0 && !processing) {

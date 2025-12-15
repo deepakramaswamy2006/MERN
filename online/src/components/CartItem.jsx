@@ -3,7 +3,12 @@ import React from 'react'
 export default function CartItem({ item, onUpdate, onRemove }) {
   return (
     <div className="card cart-item">
-      <img src={item.image} alt={item.name} className="cart-thumb" />
+      <img
+        src={item.image}
+        alt={item.name}
+        className="cart-thumb"
+        onError={e => e.target.src = 'https://via.placeholder.com/80'}
+      />
       <div style={{flex:1}}>
         <div style={{fontWeight:600}}>{item.name}</div>
         <div className="muted">₹{item.price} each</div>

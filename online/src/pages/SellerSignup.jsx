@@ -1,10 +1,11 @@
 import React, { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
-import { signup } from '../api'
+import { signupSeller } from '../api'
 
-export default function Signup() {
+export default function SellerSignup() {
   const [name, setName] = useState('')
   const [email, setEmail] = useState('')
+  const [shopName, setShopName] = useState('')
   const [password, setPassword] = useState('')
   const [confirmPassword, setConfirmPassword] = useState('')
   const [error, setError] = useState('')
@@ -15,8 +16,7 @@ export default function Signup() {
     e.preventDefault()
     setError('')
 
-    // Basic validation
-    if (!name || !email || !password || !confirmPassword) {
+    if (!name || !email || !shopName || !password || !confirmPassword) {
       setError('Please fill in all fields')
       return
     }
@@ -33,9 +33,8 @@ export default function Signup() {
 
     setLoading(true)
     try {
-      await signup(name, email, password)
-      // Redirect to login page after signup (don't auto-login)
-      alert('Account created successfully! Please login.')
+      await signupSeller(name, email, password, shopName)
+      alert('Seller account created successfully! Please login.')
       navigate('/login')
     } catch (err) {
       setError(err.message || 'Signup failed')
@@ -45,9 +44,12 @@ export default function Signup() {
   }
 
   return (
-    <div style={{ maxWidth: 400, margin: '40px auto' }}>
+    <div style={{ maxWidth: 450, margin: '40px auto' }}>
       <div className="card" style={{ padding: 24 }}>
-        <h2 style={{ marginTop: 0, textAlign: 'center' }}>Sign Up</h2>
+        <h2 style={{ marginTop: 0, textAlign: 'center' }}>Become a Seller</h2>
+        <p style={{ textAlign: 'center', color: '#666', marginBottom: 24 }}>
+          Start selling your products today!
+        </p>
 
         {error && (
           <div style={{ background: '#fee', color: '#c00', padding: 12, borderRadius: 8, marginBottom: 16 }}>
@@ -57,12 +59,23 @@ export default function Signup() {
 
         <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
           <label style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
-            <span>Name</span>
+            <span>Your Name</span>
             <input
               type="text"
               value={name}
               onChange={e => setName(e.target.value)}
-              placeholder="Your name"
+              placeholder="John Doe"
+              style={{ padding: 10, borderRadius: 8, border: '1px solid #ddd', fontSize: 16 }}
+            />
+          </label>
+
+          <label style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
+            <span>Shop Name</span>
+            <input
+              type="text"
+              value={shopName}
+              onChange={e => setShopName(e.target.value)}
+              placeholder="My Awesome Shop"
               style={{ padding: 10, borderRadius: 8, border: '1px solid #ddd', fontSize: 16 }}
             />
           </label>
@@ -73,7 +86,7 @@ export default function Signup() {
               type="email"
               value={email}
               onChange={e => setEmail(e.target.value)}
-              placeholder="you@example.com"
+              placeholder="seller@example.com"
               style={{ padding: 10, borderRadius: 8, border: '1px solid #ddd', fontSize: 16 }}
             />
           </label>
@@ -101,7 +114,7 @@ export default function Signup() {
           </label>
 
           <button type="submit" className="btn" style={{ padding: 12, fontSize: 16 }} disabled={loading}>
-            {loading ? 'Creating Account...' : 'Create Account'}
+            {loading ? 'Creating Account...' : 'Create Seller Account'}
           </button>
         </form>
 
@@ -112,9 +125,9 @@ export default function Signup() {
           </Link>
         </p>
         <p style={{ textAlign: 'center', marginTop: 10, marginBottom: 0 }}>
-          Want to sell products?{' '}
-          <Link to="/become-seller" style={{ color: 'var(--accent)', fontWeight: 600 }}>
-            Become a Seller
+          Want to buy instead?{' '}
+          <Link to="/signup" style={{ color: 'var(--accent)', fontWeight: 600 }}>
+            Sign up as Buyer
           </Link>
         </p>
       </div>

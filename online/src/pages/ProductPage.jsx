@@ -29,6 +29,17 @@ export default function ProductPage(){
       return
     }
     addToCart(product, 1)
+    alert('Added to cart!')
+  }
+
+  function handleBuyNow() {
+    if (!isLoggedIn()) {
+      alert('Please login to buy items')
+      navigate('/login')
+      return
+    }
+    addToCart(product, 1)
+    navigate('/checkout')
   }
 
   if (loading) return <div className="center card">Loading…</div>
@@ -38,15 +49,65 @@ export default function ProductPage(){
   return (
     <div className="product-page">
       <div className="card">
-        <img src={product.image} alt={product.name} style={{width:'100%',borderRadius:10}} />
+        <img
+          src={product.image}
+          alt={product.name}
+          style={{width:'100%', maxHeight: 400, objectFit: 'cover', borderRadius:10}}
+          onError={e => e.target.src = 'https://via.placeholder.com/400'}
+        />
         <h2 style={{marginTop:12}}>{product.name}</h2>
         <p className="muted">{product.description}</p>
+        {product.category && (
+          <div style={{ marginTop: 8 }}>
+            <span style={{
+              background: '#f0f0f0',
+              padding: '4px 12px',
+              borderRadius: 20,
+              fontSize: 13
+            }}>
+              {product.category}
+            </span>
+          </div>
+        )}
+        {product.sellerName && (
+          <div style={{ marginTop: 12, fontSize: 14, color: '#666' }}>
+            Sold by: <strong>{product.sellerName}</strong>
+          </div>
+        )}
       </div>
 
       <aside className="card">
-        <div style={{fontSize:18,fontWeight:700}}>₹{product.price}</div>
+        <div style={{fontSize: 24, fontWeight: 700, color: 'var(--accent)'}}>₹{product.price}</div>
         <div className="muted" style={{margin:'8px 0'}}>Delivery in 30-45 mins</div>
-        <button className="btn" onClick={handleAddToCart}>Add to cart</button>
+        {product.stock !== undefined && (
+          <div style={{
+            fontSize: 14,
+            color: product.stock > 0 ? '#28a745' : '#dc3545',
+            marginBottom: 12
+          }}>
+            {product.stock > 0 ? `In Stock (${product.stock} available)` : 'Out of Stock'}
+          </div>
+        )}
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+          <button className="btn" onClick={handleAddToCart} style={{ padding: '12px 20px' }}>
+            Add to Cart
+          </button>
+          <button
+            onClick={handleBuyNow}
+            style={{
+              padding: '12px 20px',
+              borderRadius: 8,
+              border: 'none',
+              background: '#28a745',
+              color: 'white',
+              fontWeight: 600,
+              fontSize: 16,
+              cursor: 'pointer'
+            }}
+          >
+            Buy Now
+          </button>
+        </div>
       </aside>
     </div>
   )
